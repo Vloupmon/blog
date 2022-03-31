@@ -31,7 +31,6 @@ steps:
         from_secret: ssh_address
       SSH_KEY:
         from_secret: ssh_key
-      SSH_COMMAND
     commands:
       - "apk update && apk upgrade"
       - "apk add openssh"
