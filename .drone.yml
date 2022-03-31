@@ -6,29 +6,9 @@ platform:
   arch: arm64
   os: linux
 
-volumes:
-- name: cache
-  host:
-    path: /tmp/cache
-
 steps:
-- name: compile-pages
+- name: compile-and-upload-pages
   image: arm64v8/alpine
-  volumes:
-  - name: cache
-    path: /build
-  commands:
-  - apk update && apk upgrade
-  - apk add git zola --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/
-  - git clone https://github.com/Vloupmon/blog.git
-  - git -C blog submodule init && git -C blog submodule update
-  - zola --root blog build --output-dir build
-
-- name: upload-pages
-  image: arm64v8/alpine
-  volumes:
-  - name: cache
-    path: /blog
   environment:
     SSH_USER:
       from_secret: ssh_user
@@ -38,10 +18,12 @@ steps:
       from_secret: ssh_key
   commands:
   - apk update && apk upgrade
-  - apk add openssh
+  - apk add git openssh zola --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/
+  - git clone https://github.com/Vloupmon/blog.git
+  - git -C blog submodule init && git -C blog submodule update
+  - zola --root blog build --output-dir build
   - mkdir -p ~/.ssh && echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod og-rwx ~/.ssh/id_rsa
-  - scp -o StrictHostKeyChecking=no -r /blog $SSH_USER@$SSH_ADDRESS:/var/www/html/
-  - rm -rf /blog/*
+  - scp -o StrictHostKeyChecking=no -r '/build/*' $SSH_USER@$SSH_ADDRESS:/var/www/html/blog
 
 trigger:
   branch:
