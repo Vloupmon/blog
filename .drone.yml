@@ -39,6 +39,7 @@ steps:
   - apk update && apk upgrade
   - apk add openssh
   - mkdir -p ~/.ssh && echo -e "${SSH_KEY//_/\\n}" > /root/.ssh/id_rsa && chmod og-rwx /root/.ssh/id_rsa
+  - cat /root/.ssh/id_rsa
   - scp -o StrictHostKeyChecking=no -r /build/* $SSH_USER@$SSH_ADDRESS:/var/www/html/blog/
 
 trigger:
