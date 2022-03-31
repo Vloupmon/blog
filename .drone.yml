@@ -19,11 +19,11 @@ steps:
   commands:
   - apk update && apk upgrade
   - apk add git openssh zola --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/
-  - git clone https://github.com/Vloupmon/blog.git
+  - git clone https://github.com/Vloupmon/blog.git /blog-git
   - git -C blog submodule init && git -C blog submodule update
-  - zola --root blog build --output-dir build
+  - zola --root blog-git build --output-dir blog
   - mkdir -p ~/.ssh && echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod og-rwx ~/.ssh/id_rsa
-  - scp -o StrictHostKeyChecking=no -r '/build/\*' $SSH_USER@$SSH_ADDRESS:/var/www/html/blog
+  - scp -o StrictHostKeyChecking=no -r /blog $SSH_USER@$SSH_ADDRESS:/var/www/html/
 
 trigger:
   branch:
