@@ -7,14 +7,14 @@ platform:
   os: linux
 
 volumes:
-- name: build
+- name: cache
   temp: {}
 
 steps:
 - name: compile-pages
   image: arm64v8/alpine
   volumes:
-  - name: build
+  - name: cache
     path: /build
   commands:
   - apk update && apk upgrade
@@ -26,8 +26,8 @@ steps:
 - name: upload-pages
   image: arm64v8/alpine
   volumes:
-  - name: build
-    path: /build
+  - name: cache
+    path: /blog
   environment:
     SSH_USER:
       from_secret: ssh_user
@@ -39,7 +39,7 @@ steps:
   - apk update && apk upgrade
   - apk add openssh
   - mkdir -p ~/.ssh && echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod og-rwx ~/.ssh/id_rsa
-  - scp -o StrictHostKeyChecking=no -r /build/. $SSH_USER@$SSH_ADDRESS:/var/www/html/blog/
+  - scp -o StrictHostKeyChecking=no -fr /blog $SSH_USER@$SSH_ADDRESS:/var/www/html/
 
 trigger:
   branch:
