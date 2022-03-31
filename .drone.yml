@@ -10,20 +10,20 @@ steps:
   - name: compile-pages
     image: arm64v8/alpine
     volumes:
-      - name: build
-        path: /build
+    - name: build
+      path: /build
     commands:
-      - "apk update && apk upgrade"
-      - "apk add git zola --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/"
-      - "git clone https://github.com/Vloupmon/blog.git"
-      - "git -C blog submodule init && git -C blog submodule update"
-      - "zola --root blog build --output-dir build"
+    - "apk update && apk upgrade"
+    - "apk add git zola --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/"
+    - "git clone https://github.com/Vloupmon/blog.git"
+    - "git -C blog submodule init && git -C blog submodule update"
+    - "zola --root blog build --output-dir build"
 
   - name: upload-pages
     image: arm64v8/alpine
     volumes:
-      - name: build
-        path: /build
+    - name: build
+      path: /build
     environment:
       SSH_USER:
         from_secret: ssh_user
@@ -32,9 +32,9 @@ steps:
       SSH_KEY:
         from_secret: ssh_key
     commands:
-      - "apk update && apk upgrade"
-      - "apk add openssh"
-      - "echo "${SSH_KEY}" | grep -qw "less" | scp -r -q -i /dev/stdin /build/* $SSH_USER@$SSH_ADDRESS:/var/www/html/blog/"
+    - "apk update && apk upgrade"
+    - "apk add openssh"
+    - "echo "${SSH_KEY}" | grep -qw "less" | scp -r -q -i /dev/stdin /build/* $SSH_USER@$SSH_ADDRESS:/var/www/html/blog/"
 
 trigger:
   branch:
