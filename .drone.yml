@@ -8,8 +8,8 @@ platform:
 
 volumes:
 - name: cache
-  temp:
-    medium: memory
+  host:
+    path: /tmp/cache
 
 steps:
 - name: compile-pages
@@ -41,6 +41,7 @@ steps:
   - apk add openssh
   - mkdir -p ~/.ssh && echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod og-rwx ~/.ssh/id_rsa
   - scp -o StrictHostKeyChecking=no -r /blog $SSH_USER@$SSH_ADDRESS:/var/www/html/
+  - rm -rf /blog/*
 
 trigger:
   branch:
