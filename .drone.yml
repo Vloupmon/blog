@@ -9,8 +9,6 @@ platform:
 trigger:
   branch:
     - master
-  event:
-    - push
 
 steps:
 - name: compile-and-upload-pages
