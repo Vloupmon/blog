@@ -26,7 +26,7 @@ I obviously took the second path, as any self-important engineer would.
 
 ## Systemd on WSL2 : get the `genie`out of the bottle
 
-As said above, WSL2 simply doesn't ship with `systemd`. And going by the issues on Github, it might never will.
+As said above, WSL2 simply doesn't ship with `systemd`. And going by the issues on Github, it probably never will.
 A few Google search later, you might find yourself contemplating obscure and out-of-date shell script for a distribution that not's even yours.
 And digging more, you may find a project that's remarkably well put, contained and saved the life of this blog post : [`genie`](https://github.com/arkane-systems/genie).
 
@@ -80,6 +80,18 @@ The canonical way of running Docker on Windows, with or without using WSL2, is t
 ### Cleaning up
 
 Before going any further, make sure you uninstall Docker Desktop if it's present in your system and inside of WSL2 run `sudo rm /usr/bin/docker*` to cleanup the dangling symbolic links which might conflict with `apt`.
+
+I also **highly** encourage you to change the WSL2 DNS config a bit, it has a tendency to break itself regularly and might prevent you to pull Docker images properly. This will set your DNS to Google's and will prevent it from getting overwritten :
+
+```bash
+sudo tee /etc/wsl.conf > /dev/null << EOF
+[network]
+generateResolvConf=false
+EOF
+
+echo -e 'nameserver 8.8.8.8\nnameserver 8.8.4.4' | sudo tee /etc/resolv.conf > /dev/null;
+sudo chattr -f +i /etc/resolv.conf;
+```
 
 ### Installing Docker
 
@@ -258,7 +270,7 @@ With this done, you can deploy pods on your cluster as is :
 kubectl create deployment nginx --image=nginx --replicas=5
 ```
 
-{{ image(src="kubectl-nginx-running.png") }}
+![](kubectl-nginx-running.png)
 
 If you would rather deploy separate worker nodes, then you'll need to use `kubeadm join` on a different machine that can communicate over the network with your master node. You can use the string from the master node you should have saved, or you can generate a new token and join string with :
 
