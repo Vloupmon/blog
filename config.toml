@@ -20,6 +20,8 @@ highlight_code = true
 author = "Vincent Loupmon"
 logo_text = "~vincent_loupmon"
 copyright_html = "Vincent Loupmon&nbsp;<b>2022</b>"
+favicon = "/favicon.png"
+favicon_mimetype = "image/png"
 
 menu_items = [
     # $BASE_URL is going to be substituted by base_url from configuration
