@@ -6,6 +6,12 @@ platform:
   arch: arm64
   os: linux
 
+trigger:
+  branch:
+  - master
+  event:
+  - push
+
 steps:
 - name: compile-and-upload-pages
   image: arm64v8/alpine
@@ -24,7 +30,3 @@ steps:
   - zola --root /blog-git build --output-dir /blog
   - mkdir -p ~/.ssh && echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod og-rwx ~/.ssh/id_rsa
   - scp -o StrictHostKeyChecking=no -r /blog $SSH_USER@$SSH_ADDRESS:/var/www/html/
-
-trigger:
-  branch:
-  - master
