@@ -8,10 +8,8 @@ platform:
 
 trigger:
   branch:
-    include:
     - master
   event:
-    include:
     - push
 
 steps:
