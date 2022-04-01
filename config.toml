@@ -20,20 +20,18 @@ highlight_code = true
 # Put all your custom variables here
 author = "Vincent Loupmon"
 logo_text = "~vincent_loupmon"
-copyright_html = "Vincent Loupmon&nbsp;<b>2022</b>"
+copyright_html = "©&nbsp;Vincent Loupmon&nbsp;<b>2022</b>"
 favicon = "/favicon.png"
 favicon_mimetype = "image/png"
 
 menu_items = [
     # $BASE_URL is going to be substituted by base_url from configuration
     {name = "", url = "$BASE_URL"},
-    
     # tags should only be enabled if you have "tags" taxonomy
     # see documentation below for more details
     {name = "tags", url = "$BASE_URL/tags"},
     {name = "archive", url = "$BASE_URL/archive"},
     {name = "about me", url = "$BASE_URL/about"},
-    
     # set newtab to true to make the link open in new tab
     {name = "github", url = "https://github.com/Vloupmon", newtab = true},
     {name = "twitter", url = "https://twitter.com/lefrancais", newtab = true},
