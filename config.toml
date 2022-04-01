@@ -1,5 +1,6 @@
 # The URL the site will be built for
 base_url = "https://blog.loupmon.com"
+title = "Vincent Loupmon's Blog"
 
 # Theme
 theme = "terminimal"
