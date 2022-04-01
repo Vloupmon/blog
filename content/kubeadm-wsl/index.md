@@ -1,5 +1,5 @@
 +++
-title="Kubernetes cluster on WSL2 with Docker and Kubeadm"
+title="Kubernetes cluster on WSL2 with Systemd, Docker and Kubeadm"
 slug="installing-systemd-docker-kubernetes-wsl-deploy-kubeadm"
 date="2022-04-01"
 
