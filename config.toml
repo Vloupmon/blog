@@ -8,6 +8,11 @@ theme = "terminimal"
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
 
+# Taxonomies
+taxonomies = [
+    {name = "tags"},
+]
+
 # Whether to build a search index to be used later on by a JavaScript library
 build_search_index = true
 
@@ -35,8 +40,4 @@ menu_items = [
     # set newtab to true to make the link open in new tab
     {name = "github", url = "https://github.com/Vloupmon", newtab = true},
     {name = "twitter", url = "https://twitter.com/lefrancais", newtab = true},
-]
-
-taxonomies = [
-    {name = "tags"},
 ]
