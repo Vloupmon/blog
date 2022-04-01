@@ -127,11 +127,11 @@ If everything went well, Docker is not working yet !
 
 `systemctl --failed` should tell you `docker.service`and `docker.socket` can't start up.
 
-{{ image(src="docker-systemctl-failed.png") }}
+![](docker-systemctl-failed.png)
 
 And a look at `journalctl -xeu docker.service` will tell you something is wrong with the network, or really with `iptables`.
 
-{{ image(src="docker-iptables-error.png") }}
+![](docker-iptables-error.png)
 
 First, you need to tell Docker where to find the socket and not to use `iptables`.
 
@@ -160,7 +160,7 @@ Docker should be up and running. If `sudo systemctl daemon-reload` fails with so
 
 At this point, you should be able to run `docker run hello-world` and confirm everything is working well.
 
-{{ image(src="docker-hello-world.png") }}
+![](docker-hello-world.png)
 
 ## Running a Kubernetes cluster
 
@@ -180,7 +180,7 @@ The _normal_ behaviour of `kubelet` with Docker installed on the same machine is
 
 Open `/etc/systemd/system/kubelet.service.d/10-kubeadm.conf` and edit it so that the `ExecStart` line looks like this:
 
-{{ image(src="kubeadm-conf.png") }}
+![](kubeadm-conf.png)
 
 ```
 ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS --cgroup-driver=cgroupfs
@@ -220,7 +220,7 @@ kubeadm init --pod-network-cidr=10.200.0.0/16
 
 If everything goes well, you should see something like this :
 
-{{ image(src="kubeadm-success.png") }}
+![](kubeadm-success.png)
 
 **If it's not working**, it means `kubectl` isn't starting properly. Check for errors with `journalctl -xeu kubelet.service`. If it's about swap or the `cgroup-driver`, go back up to the section above. I'm not familiar with other issues that might crop up.
 In any case, after a failed try, you need to cleanup your files before doing another `kubeadm init` :
@@ -239,7 +239,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 At this point, if you run `kubectl get pods -A` you should see running system pods. Congratulations, you've got a cluster!
 
-{{ image(src="kubectl-get-pods-pending.png") }}
+![](kubectl-get-pods-pending.png)
 
 But what's going on with that [CoreDNS](https://coredns.io/) thing ? Well CoreDNS is a DNS server that manages DNS records for pods as well as service discovery. As such, it expects a [pod network](https://kubernetes.io/docs/concepts/cluster-administration/networking/). There is no standard implementation of the Kubernetes networking model and Kubernetes doesn't ship with one, it's up to us to provide it.
 
@@ -252,7 +252,7 @@ kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Doc
 
 Wait a minute or so, try `kubectl get pods -A` and you should be seeing something like that :
 
-{{ image(src="kubectl-get-pods-running.png") }}
+![](kubectl-get-pods-running.png)
 
 **Success !** We have a fully functional base cluster running ! All we're lacking is some nodes to run pods on !
 
