@@ -36,7 +36,7 @@ menu_items = [
     # see documentation below for more details
     {name = "tags", url = "$BASE_URL/tags"},
     {name = "archive", url = "$BASE_URL/archive"},
-    {name = "about me", url = "$BASE_URL/about"},
+    {name = "resume", url = "https://resume.loupmon.com"},
     # set newtab to true to make the link open in new tab
     {name = "github", url = "https://github.com/Vloupmon", newtab = true},
     {name = "twitter", url = "https://twitter.com/lefrancais", newtab = true},
