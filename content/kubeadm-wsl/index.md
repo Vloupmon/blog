@@ -12,7 +12,7 @@ tags = ["devops", "kubernetes", "docker", "systemd", "wsl2"]
 In the course of taking my Kubernetes self-education a bit more seriously,
 I've been keen on setting up a cluster from "nothing" locally.
 I previously was using the mediation of the excellent [`minikube`](https://minikube.sigs.k8s.io/docs/start/) to get a cluster and nodes running instantly on a docker-enabled machine.
-In fact it is still what I'd recommend to any aspirational k8s admin.
+In fact it is still what I'd recommend to any aspirational k8s admin. There are alternative to `minikube` such as [`microk8s`](https://microk8s.io), [`kind`](https://kind.sigs.k8s.io) and [`k3s`](https://k3s.io).
 But I wanted the real thing. I wanted to be familiar with `kubeadm`, configuring a cluster from a blank state and all that good stuff.
 
 Here's the problem : my development Linux machine happens to be a WSL2 Debian virtual machine on Windows 10.
@@ -82,7 +82,12 @@ The canonical way of running Docker on Windows, with or without using WSL2, is t
 
 ### Cleaning up
 
-Before going any further, make sure you uninstall Docker Desktop if it's present in your system and inside of WSL2 run `sudo rm /usr/bin/docker*` to cleanup the dangling symbolic links which might conflict with `apt`.
+Before going any further, make sure you uninstall Docker Desktop if it's present in your system and inside of WSL2 cleanup the dangling symbolic links which might conflict with `apt` :
+
+```bash
+sudo rm /usr/local/bin/kubectl;
+sudo rm /usr/bin/docker*
+```
 
 I also **highly** encourage you to change the WSL2 DNS config a bit, it has a tendency to break itself regularly and might prevent you to pull Docker images properly. This will set your DNS to Google's and will prevent it from getting overwritten :
 
@@ -113,7 +118,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io
 Make sure your user is in the `docker` group, so you can use containers without `sudo` and avoid other side effects :
 
 ```bash
-sudo groupadd docker &&
+sudo groupadd docker;
 sudo usermod -aG docker $USER &&
 newgrp docker
 ```
@@ -132,7 +137,7 @@ If everything went well, Docker is not working yet !
 
 ![](docker-systemctl-failed.png)
 
-And a look at `journalctl -xeu docker.service` will tell you something is wrong with the network, or really with `iptables`.
+And a look at `journalctl -xeu docker.service` will tell you something is wrong with the network controller, or really with `iptables` :
 
 ![](docker-iptables-error.png)
 
@@ -176,7 +181,8 @@ sudo apt-get update && sudo apt-get install -y apt-transport-https curl &&
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - &&
 echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list &&
 sudo apt-get update &&
-sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-get install -y kubelet kubeadm kubectl &&
+apt-mark hold kubelet kubeadm kubectl
 ```
 
 The _normal_ behaviour of `kubelet` with Docker installed on the same machine is to automatically detect the [cgroup](https://en.wikipedia.org/wiki/Cgroups) driver. It doesn't quite work on WSL2. The Kubernetes documentation states that `/var/lib/kubelet/config.yaml` should be used to configure it, but as it happens the file gets overwritten upon invocation of `kubeadm init`. Thus our only options is to use the _deprecated_ `--cgroup-driver` flag in `kubelet`'s `ExecStart`. In our case the driver is `cgroupfs`.
@@ -215,7 +221,7 @@ sudo systemctl restart kubelet
 
 ### Our first cluster
 
-We're ready to role ! We'll start by initializing a brand new master node for our cluster with one option : a [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) range for pods. While it is not strictly speaking necessary to init a cluster, we'll need it later. The entire `10.0.0.0/8` range is private, which gives use a comfortable 2^24 IPs, that is over 16 millions, to play with. For this example I'll use `10.200.0.0/16`.
+We're ready to roll ! We'll start by initializing a brand new master node for our cluster with one option : a [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) range for pods. While it is not strictly speaking necessary to init a cluster, we'll need it later. The entire `10.0.0.0/8` range is private, which gives use a comfortable 2^24 IPs, that is over 16 millions, to play with. For this example I'll use `10.200.0.0/16`.
 
 ```bash
 kubeadm init --pod-network-cidr=10.200.0.0/16
@@ -232,9 +238,10 @@ In any case, after a failed try, you need to cleanup your files before doing ano
 sudo kubeadm reset
 ```
 
-If it's working, just follow the instructions at the end of the prompt. You might want to write down the `kubeadm join ...` string at the bottom if you want to set up extra nodes. This will simply put the new cluster in your `kubectl` context :
+**If it's working**, just follow the instructions at the end of the prompt. You might want to write down the `kubeadm join ...` string at the bottom if you want to set up extra nodes. This will simply put the new cluster in your `kubectl` context :
 
 ```bash
+rm -rf $HOME/.kube;
 mkdir -p $HOME/.kube &&
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config &&
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
@@ -261,6 +268,9 @@ Wait a minute or so, try `kubectl get pods -A` and you should be seeing somethin
 
 ### Setting up nodes
 
+#### Single node setup
+
+You can use the master node deployed as the core of your cluster as you would any other node.
 By default, the master node has taints preventing you from running pods on it. You can untaint it with :
 
 ```bash
@@ -275,6 +285,8 @@ kubectl create deployment nginx --image=nginx --replicas=5
 
 ![](kubectl-nginx-running.png)
 
+#### Multi-node setup
+
 If you would rather deploy separate worker nodes, then you'll need to use `kubeadm join` on a different machine that can communicate over the network with your master node. You can use the string from the master node you should have saved, or you can generate a new token and join string with :
 
 ```bash
@@ -288,3 +300,5 @@ sudo kubeadm join ...
 ```
 
 There are many ways to join nodes and connect between them, I'll let you check the [documentation](https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-join/).
+
+If you want to run extra nodes on the same machine, then you'll have to use VMs or containers and figure routing out.
