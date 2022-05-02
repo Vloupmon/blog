@@ -141,19 +141,12 @@ And a look at `journalctl -xeu docker.service` will tell you something is wrong 
 
 ![](docker-iptables-error.png)
 
-First, you need to tell Docker where to find the socket and not to use `iptables`.
+You need to tell Docker not to use `iptables`.
 
 ```bash
 echo -e "{
-        \"hosts\": [\"unix:///var/run/docker.sock\"],
         \"iptables\": false
 }" | sudo tee /etc/docker/daemon.json > /dev/null
-```
-
-Then you need to remove the host flag (`-H`) from the `docker.service` `ExecStart` line. You can `sudo vi` it or simply use this one-liner :
-
-```bash
-sudo sed -i 's/-H fd:\/\/ //g' /etc/systemd/system/multi-user.target.wants/docker.service
 ```
 
 Next, reload the daemon configuration files and restart the docker service :
